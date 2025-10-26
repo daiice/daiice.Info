@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool by Daiice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card:nth-child(1) { animation-delay: 0.1s; }
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.3s; }
+        .tool-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover .icon {
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .tool-card h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .tool-card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 15px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Tool by Daiice</h1>
+            <p>เครื่องมือที่ช่วยให้ชีวิตการทำงานคุณง่ายขึ้น</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card" onclick="navigateTo('webex')">
+                <div class="icon">📹</div>
+                <h2>Request WebEx</h2>
+                <p>ขอสิทธิ์การใช้งาน WebEx</p>
+                <span class="badge">Shift 1</span>
+            </div>
+
+            <div class="tool-card" onclick="navigateTo('checkin')">
+                <div class="icon">✅</div>
+                <h2>Check in Daily</h2>
+                <p>เช็คอินรายชื่อคนเข้ากะของวัน</p>
+                <span class="badge">Shift 1</span>
+            </div>
+
+            <div class="tool-card" onclick="navigateTo('rerun')">
+                <div class="icon">🔄</div>
+                <h2>Rerun Job</h2>
+                <p>Rerun Job</p>
+                <span class="badge">WGW</span>
+            </div>
+
+            <div class="tool-card" onclick="navigateTo('passport')">
+                <div class="icon">📘</div>
+                <h2>Change Passport</h2>
+                <p>Change Passport</p>
+                <span class="badge">WSA</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(tool) {
+            const urls = {
+                'webex': 'https://daiice.github.io/RequestWebEx/',
+                'checkin': 'https://daiice.github.io/CheckInDaily/',
+                'rerun': 'https://daiice.github.io/RerunJob/',
+                'passport': 'https://daiice.github.io/Passport/'
+            };
+
+            // เปิดลิงก์ไปยังหน้า tool
+            window.location.href = urls[tool];
+        }
+
+        // เพิ่มเอฟเฟกต์เมื่อโหลดหน้า
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.tool-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
