@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rerun Jobs Tool_V3 by Daiice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .tabs-header {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e0e0e0;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .tab-button.active {
+            color: #667eea;
+            background: white;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+		
+		.header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header-section {
+            text-align: center;
+            padding: 20px 0 30px;
+        }
+        
+        .header-section h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .header-section p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .btn-success {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-success.copied {
+            background: #17a2b8;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .email-preview {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .email-subject {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 16px;
+        }
+        
+        .email-body-wgw {
+            color: #333;
+            white-space: pre-wrap;
+        }
+		
+		.email-body-odate {
+            color: #333;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #0c5460;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .job-list-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+		
+		.job-list-section textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .job-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .job-input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #667eea;
+            font-size: 14px;
+        }
+        
+        .file-input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        input[type="file"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .button-group button {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-download:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #filename, #msg-findjob {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        #filename {
+            background: #f8f9ff;
+            color: #667eea;
+            border-left: 4px solid #667eea;
+        }
+        
+        #msg-findjob {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        tr:hover {
+            background: #f8f9ff;
+        }
+        
+        mark.main {
+            background: #ffeb3b;
+            color: #d32f2f;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        mark.secondary {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .notfound {
+            background: #ffebee;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: #c62828;
+            margin-top: 20px;
+            border-left: 4px solid #f44336;
+            line-height: 1.8;
+        }
+        
+        .notfound b {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                padding: 15px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+		<div class="header">
+            <h1>🛠️ Rerun Jobs Tool_V3 by Daiice</h1>
+            <p>เครื่องมือสำหรับสร้างข้อความ ค้นหา log และคำนวณ Odate</p>
+        </div>
+		
+        <div class="tabs-header">
+            <button class="tab-button active" data-tab="wgw">📧 WGW Email Generator</button>
+            <button class="tab-button" data-tab="findjob">🔍 FindReJob</button>
+            <button class="tab-button" data-tab="odate">🗓️ Odate Calculator</button>
+        </div>
+
+        <!-- Tab 1: WGW Email Generator -->
+        <div class="tab-content active" id="wgw-tab">
+
+            <div class="info-box">
+                📧 <strong>WGW Email Generator :</strong> ระบบสร้างข้อความเปิด Incident Mail
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="wgwDate">📅 วันที่ปัจจุบัน:</label>
+                    <input type="date" id="wgwDate">
+                </div>
+                
+                <button class="btn-primary btn-green" onclick="generateWGWEmail()">✉️ สร้างข้อความ</button>
+            </div>
+            
+            <div id="wgwError"></div>
+            <div id="wgwResult" class="result-section"></div>
+        </div>
+
+        <!-- Tab 2: FindReJob -->
+        <div class="tab-content" id="findjob-tab">
+		
+			<div class="info-box">
+                🔍 <strong>Find ReRun Job :</strong> ระบบค้นหา Order IDs ในไฟล์ log
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label>📋 วาง Order IDs (คั่นบรรทัดใหม่):</label>
+                    <textarea id="orderList" placeholder="ตัวอย่าง: 2382509230006571&#10;2382509230006437"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>📁 อัพโหลดไฟล์ .txt (log):</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" accept=".txt">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="btnSearch">🔎 ค้นหา</button>
+                    <button class="btn-download" id="btnDownload" disabled>💾 ดาวน์โหลด CSV</button>
+                </div>
+                
+                <div id="filename"></div>
+                <div id="msg-findjob"></div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="resultTable" style="display:none">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Confirmation note</th>
+                            <th>AMC</th>
+                            <th>Action</th>
+                            <th>Fund</th>
+                            <th>Order ID</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div id="notfoundList"></div>
+        </div>
+
+        <!-- Tab 3: Odate Calculator -->
+        <div class="tab-content" id="odate-tab">
+		
+			<div class="info-box">
+                🗓️ <strong>Odate Calculator :</strong> ระบบคำนวณวันที่ Odate
+            </div>
+                        
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="incNumber">🎫 หมายเลข INC:</label>
+                    <input type="text" id="incNumber" placeholder="เช่น INC000000818155">
+                </div>
+                
+                <div class="input-group">
+                    <label for="currentDate">📅 วันปัจจุบัน (Current Date):</label>
+                    <input type="date" id="currentDate">
+                </div>
+                
+                <div class="input-group">
+                    <label for="genDate">📄 วันที่ Gen ไฟล์ (Gen Date):</label>
+                    <input type="date" id="genDate">
+                </div>
+                
+                <div class="job-list-section">
+                    <div class="job-input-group">
+                        <label for="jobs1">📋 Jobs สำหรับข้อ 1:</label>
+                        <textarea id="jobs1" placeholder="ใส่รายชื่อ Job (แยกบรรทัด)&#10;เช่น&#10;U752IMD080"></textarea>
+                    </div>
+                    
+                    <div class="job-input-group">
+                        <label for="jobs2">📋 Jobs สำหรับข้อ 2:</label>
+                        <textarea id="jobs2" placeholder="ใส่รายชื่อ Job (แยกบรรทัด)&#10;เช่น&#10;U805IMB015&#10;U814FTB5142"></textarea>
+                    </div>
+                    
+                    <div class="job-input-group">
+                        <label for="jobs3">📋 Jobs สำหรับข้อ 3:</label>
+                        <textarea id="jobs3" placeholder="ใส่รายชื่อ Job (แยกบรรทัด)&#10;เช่น&#10;U805IMB044&#10;U805EXB041"></textarea>
+                    </div>
+                    
+                    <div class="job-input-group">
+                        <label for="jobs45">📋 Jobs สำหรับข้อ 4-5:</label>
+                        <textarea id="jobs45" placeholder="ใส่รายชื่อ Job (แยกบรรทัด)&#10;เช่น&#10;U805IMD039"></textarea>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="calculateOdate()">🔍 สร้างข้อความ</button>
+            </div>
+            
+            <div id="odateError"></div>
+            <div id="odateResult" class="result-section"></div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+
+        // ===== WGW Email Generator Functions =====
+        document.getElementById('wgwDate').valueAsDate = new Date();
+
+        function formatDateWithMonth(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        function generateWGWEmail() {
+            const currentDateInput = document.getElementById('wgwDate').value;
+            const errorDiv = document.getElementById('wgwError');
+            const resultDiv = document.getElementById('wgwResult');
+            
+            errorDiv.innerHTML = '';
+            
+            if (!currentDateInput) {
+                errorDiv.innerHTML = '<div class="error">⚠️ กรุณาเลือกวันที่ปัจจุบัน</div>';
+                resultDiv.classList.remove('show');
+                return;
+            }
+            
+            const currentDate = new Date(currentDateInput);
+            const dateStr = formatDateWithMonth(currentDate);
+            
+            const subject = `WGW รบกวนขอเปิด Incident เพื่อ Rerun Jobs วันที่ ${dateStr}`;
+            
+            let emailBody = `เรียน K-help\n\n`;
+            emailBody += `รบกวนขอเปิด Incident ครับ\n\n`;
+            emailBody += `System :  WGW\n\n`;
+            emailBody += `รายละเอียด : WGW ขอ Rerun Job เพื่อนำข้อมูลรายการ allotment transaction และ  unitholder balance ของกองต่างประเทศเข้าระบบ (${dateStr})\n\n`;
+            emailBody += `     เนื่องจากกองต่างประเทศมีการส่งข้อมูลมาหลังจากเวลาที่ระบบนำข้อมูลเข้าในช่วง 9.15 จึงต้องมีการ rerun เพื่อนำรายการเข้าเพิ่มเติมเพื่อให้ทาง edocgen สามารถออก Confirmation note ให้ลูกค้าได้ครับ`;
+            
+            const html = `
+                <div class="email-preview">
+                    <div class="email-subject">
+                        <strong>หัวเรื่อง:</strong> ${subject}
+                    </div>
+                    <div class="email-body-wgw">${emailBody}</div>
+                </div>
+                <button class="btn-success" onclick="copyWGWEmail()">📋 คัดลอกข้อความ</button>
+            `;
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.add('show');
+            
+            window.wgwEmailText = `${subject}\n\n${emailBody}`;
+        }
+
+        function copyWGWEmail() {
+            const text = window.wgwEmailText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('#wgwResult .btn-success');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ คัดลอกแล้ว!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('ไม่สามารถคัดลอกได้: ' + err);
+            });
+        }
+
+        // ===== FindReJob Functions =====
+        function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+        function markText(text, keyword, cls){
+            if(!keyword) return text;
+            try {
+                const re = new RegExp(escapeRegExp(keyword), 'g');
+                return text.replace(re, `<mark class="${cls}">${keyword}</mark>`);
+            } catch(e) { return text; }
+        }
+
+        document.getElementById('btnSearch').addEventListener('click', ()=>{
+            const orderText = document.getElementById('orderList').value.trim();
+            const file = document.getElementById('fileInput').files[0];
+            const msg = document.getElementById('msg-findjob');
+            const filenameDiv = document.getElementById('filename');
+            const notfoundDiv = document.getElementById('notfoundList');
+            msg.textContent = '';
+            notfoundDiv.innerHTML = '';
+
+            if(!orderText){ alert('กรุณาใส่ Order IDs'); return; }
+            if(!file){ alert('กรุณาอัพโหลดไฟล์ .txt'); return; }
+
+            filenameDiv.textContent = "📂 ค้นหาจากไฟล์: " + file.name;
+
+            const orders = orderText.split(/\s+/).filter(Boolean);
+            const reader = new FileReader();
+            reader.onload = function(e){
+                const text = e.target.result;
+                const lines = text.split(/\r?\n/);
+                const tbody = document.querySelector('#resultTable tbody');
+                tbody.innerHTML = '';
+                const rowsForCsv = [];
+
+                let foundCount = 0;
+                const notFoundOrders = [];
+
+                orders.forEach(order => {
+                    let foundThisOrder = false;
+
+                    lines.forEach(line => {
+                        if(!line.includes(order)) return;
+                        foundThisOrder = true;
+
+                        const colsRaw = line.split('|');
+                        const cols = colsRaw.map(c => (c||'').trim());
+
+                        let orderIdx = cols.findIndex(c => c && (c === order || c.includes(order)));
+                        if(orderIdx === -1){
+                            orderIdx = cols.findIndex(c => c && c.indexOf(order) >= 0);
+                        }
+
+                        const dt = cols[1] || '';
+                        const txId = cols[2] || '';
+                        const company = cols[3] || '';
+                        const action = cols[6] || '';
+                        const fund = cols[7] || '';
+                        const orderId = (orderIdx !== -1 ? cols[orderIdx] : order);
+                        const status = (orderIdx !== -1 && cols.length > orderIdx+1) ? cols[orderIdx+1] : '';
+						
+						// Skip if Action is SWO
+                        if(action === 'SWO') return;
+						
+                        let companyDisplay = company ? markText(company, company, 'secondary') : '';
+                        let statusDisplay = status ? markText(status, status, 'secondary') : '';
+                        let orderDisplay = orderId ? markText(orderId, order, 'main') : '';
+
+                        if(!company && cols[4]) companyDisplay = markText(cols[4], cols[4], 'secondary');
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${dt}</td>
+                            <td>${txId}</td>
+                            <td>${companyDisplay}</td>
+                            <td>${action}</td>
+                            <td>${fund}</td>
+                            <td>${orderDisplay}</td>
+                            <td>${statusDisplay}</td>
+                        `;
+                        tbody.appendChild(tr);
+
+                        rowsForCsv.push({
+                            datetime: dt, transaction: txId, company, action, fund, order: orderId, status
+                        });
+                        foundCount++;
+                    });
+
+                    if(!foundThisOrder){
+                        notFoundOrders.push(order);
+                    }
+                });
+
+                if(foundCount === 0){
+                    msg.textContent = '❌ ไม่พบ Order IDs ที่ระบุในไฟล์';
+                    msg.style.background = '#ffebee';
+                    msg.style.color = '#c62828';
+                    msg.style.borderLeft = '4px solid #f44336';
+                    document.getElementById('resultTable').style.display = 'none';
+                    document.getElementById('btnDownload').disabled = true;
+                } else {
+                    msg.textContent = `✅ พบ ${foundCount} รายการ (แสดงเฉพาะฟิลด์สำคัญ)`;
+                    msg.style.background = '#e8f5e9';
+                    msg.style.color = '#2e7d32';
+                    msg.style.borderLeft = '4px solid #4caf50';
+                    document.getElementById('resultTable').style.display = '';
+                    document.getElementById('btnDownload').disabled = false;
+                    window._lastCsvRows = rowsForCsv;
+                }
+
+                if(notFoundOrders.length > 0){
+                    notfoundDiv.innerHTML = "<div class='notfound'><b>⚠️ ไม่พบ Order IDs:</b>" + notFoundOrders.map(id => "• " + id).join("<br>") + "</div>";
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('btnDownload').addEventListener('click', ()=>{
+            const rows = window._lastCsvRows || [];
+            if(!rows.length){ alert('ไม่มีข้อมูลให้ดาวน์โหลด'); return; }
+            const header = ['DateTime','Conf','Company','Action','Fund','OrderID','Status'];
+            const csv = [header.join(',')].concat(rows.map(r => {
+                return [r.datetime, r.transaction, r.company, r.action, r.fund, r.order, r.status]
+                    .map(x => `"${(x||'').toString().replace(/"/g,'""')}"`).join(',');
+            })).join('\r\n');
+
+            const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'search_results.csv'; document.body.appendChild(a); a.click();
+            setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 2000);
+        });
+
+        // ===== Odate Calculator Functions =====
+        const holidays2025 = ['2025-01-01', '2025-02-12', '2025-04-07', '2025-04-14', '2025-04-15', 
+                              '2025-05-01', '2025-05-05', '2025-05-12', '2025-06-02', '2025-06-03',
+                              '2025-07-10', '2025-07-28', '2025-08-11', '2025-08-12', '2025-10-13',
+                              '2025-10-23', '2025-12-05', '2025-12-10', '2025-12-31'];
+
+        document.getElementById('currentDate').valueAsDate = new Date();
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function toDateString(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
+        function isHoliday(date) {
+            return holidays2025.includes(toDateString(date));
+        }
+
+        function isWorkingDay(date) {
+            return !isWeekend(date) && !isHoliday(date);
+        }
+
+        function getPreviousWorkingDay(date) {
+            const prevDate = new Date(date);
+            prevDate.setDate(prevDate.getDate() - 1);
+            
+            while (!isWorkingDay(prevDate)) {
+                prevDate.setDate(prevDate.getDate() - 1);
+            }
+            
+            return prevDate;
+        }
+
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function getDaysBetween(startDate, endDate) {
+            const dates = [];
+            const current = new Date(startDate);
+            
+            while (current <= endDate) {
+                dates.push(new Date(current));
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return dates;
+        }
+
+        function parseJobs(text) {
+            if (!text || text.trim() === '') return [];
+            return text.split('\n').map(j => j.trim()).filter(j => j.length > 0);
+        }
+
+        function calculateOdate() {
+            const incNumber = document.getElementById('incNumber').value.trim();
+            const currentDateInput = document.getElementById('currentDate').value;
+            const genDateInput = document.getElementById('genDate').value;
+            const jobs1Text = document.getElementById('jobs1').value;
+            const jobs2Text = document.getElementById('jobs2').value;
+            const jobs3Text = document.getElementById('jobs3').value;
+            const jobs45Text = document.getElementById('jobs45').value;
+            
+            const errorDiv = document.getElementById('odateError');
+            const resultDiv = document.getElementById('odateResult');
+            
+            errorDiv.innerHTML = '';
+            
+            if (!incNumber) {
+                errorDiv.innerHTML = '<div class="error">⚠️ กรุณากรอกหมายเลข INC</div>';
+                resultDiv.classList.remove('show');
+                return;
+            }
+            
+            if (!currentDateInput || !genDateInput) {
+                errorDiv.innerHTML = '<div class="error">⚠️ กรุณากรอกวันที่ให้ครบถ้วน</div>';
+                resultDiv.classList.remove('show');
+                return;
+            }
+            
+            const currentDate = new Date(currentDateInput);
+            const genDate = new Date(genDateInput);
+            
+            const jobs1 = parseJobs(jobs1Text);
+            const jobs2 = parseJobs(jobs2Text);
+            const jobs3 = parseJobs(jobs3Text);
+            const jobs45 = parseJobs(jobs45Text);
+            
+            const odate1 = getPreviousWorkingDay(genDate);
+            const odate2 = new Date(genDate);
+            const odate3 = new Date(currentDate);
+            const odate4 = addDays(genDate, -1);
+            const odate5 = addDays(currentDate, -1);
+            
+            const daysBetween = getDaysBetween(addDays(odate4, 1), addDays(odate5, -1));
+            
+            const subject = `Ref.${incNumber} ขอ Rerun Job เนื่องจากข้อมูลจาก Source มาไม่ทัน Job schedule รอบ 9:15 วันที่ ${formatDateWithMonth(genDate)}`;
+            
+            let emailBody = `เรียน IT-Oper-Prod\n\n`;
+            emailBody += `รบกวนขอ Rerun Job เนื่องจากข้อมูลจาก Source มาไม่ทัน Job schedule รอบ 9:15 วันที่ ${formatDateWithMonth(genDate)} ตามรายละเอียดด้านล่างนี้ครับ\n\n`;
+            emailBody += `**Ref. ${incNumber}**\n\n`;
+            
+            if (jobs1.length > 0) {
+                emailBody += `ขอ Oder Job และ Run Odate = **${formatDate(odate1)} (${formatDateWithMonth(odate1)})**\n`;
+                jobs1.forEach(job => {
+                    emailBody += `${job}\n`;
+                });
+                emailBody += `\n`;
+            }
+            
+            if (jobs2.length > 0) {
+                emailBody += `ขอ Oder Job และ Rerun แบบไม่ Ignore Schedule Odate = **${formatDate(odate2)} (${formatDateWithMonth(odate2)})**\n`;
+                jobs2.forEach(job => {
+                    emailBody += `${job}\n`;
+                });
+                emailBody += `\n`;
+            }
+            
+            if (jobs3.length > 0) {
+                emailBody += `ขอ Rerun Job Odate = **${formatDate(odate3)} (${formatDateWithMonth(odate3)})**\n`;
+                jobs3.forEach(job => {
+                    emailBody += `${job}\n`;
+                });
+                emailBody += `\n`;
+            }
+            
+            if (jobs45.length > 0) {
+                emailBody += `***รันตามลำดับข้างบน หลังจาก Rerun Job ข้างบนเสร็จ รบกวนขอ Oder Job และ Run ครับ**\n`;
+                emailBody += `Odate = **${formatDate(odate4)} (${formatDateWithMonth(odate4)})**\n`;
+                jobs45.forEach(job => {
+                    emailBody += `${job}\n`;
+                });
+                
+                daysBetween.forEach(date => {
+                    emailBody += `Odate = **${formatDate(date)} (${formatDateWithMonth(date)})**\n`;
+                    jobs45.forEach(job => {
+                        emailBody += `${job}\n`;
+                    });
+                });
+                
+                emailBody += `Odate = **${formatDate(odate5)} (${formatDateWithMonth(odate5)})**\n`;
+                jobs45.forEach(job => {
+                    emailBody += `${job}\n`;
+                });
+            }
+            
+            let htmlBody = emailBody
+                .replace(/\*\*(.+?)\*\*/g, '<strong style="color: #cd5937;">$1</strong>')
+                .replace(/\n/g, '<br>');
+            
+            const html = `
+                <div class="email-preview">
+                    <div class="email-subject">
+                        <strong>หัวเรื่อง:</strong> ${subject}
+                    </div>
+                    <div class="email-body-odate">
+                        ${htmlBody}
+                    </div>
+                </div>
+                <button class="btn-success" onclick="copyOdateEmail()">📋 คัดลอกข้อความ</button>
+            `;
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.add('show');
+            
+            window.odateEmailText = `${subject}\n\n${emailBody.replace(/\*\*/g, '')}`;
+        }
+
+        function copyOdateEmail() {
+            const text = window.odateEmailText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('#odateResult .btn-success');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ คัดลอกแล้ว!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('ไม่สามารถคัดลอกได้: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
