@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Change Tool_V6 by Daiice</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .links a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .links a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .credentials {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .credentials strong {
+            color: #856404;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .input-group textarea {
+            min-height: 100px;
+            font-family: monospace;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .json-output {
+            background: #282c34;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            overflow-x: auto;
+            position: relative;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .json-output pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .json-key { color: #e06c75; }
+        .json-string { color: #98c379; }
+        .json-number { color: #d19a66; }
+        .json-boolean { color: #56b6c2; }
+        .json-null { color: #c678dd; }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .doc-type-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .doc-type-info h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+        
+        .doc-type-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .doc-type-info li {
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Passport Change Tool_V6 by Daiice</h1>
+            <div class="links">
+                <a href="https://infraelk.kasikornbank.com" target="_blank">PRD Site</a>
+                <a href="https://infraelkdr.kasikornbank.com" target="_blank">DR Site</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(event, 'wsa')">WSA Queries</button>
+                <button class="tab" onclick="switchTab(event, 'json')">JSON Formatter</button>
+                <button class="tab" onclick="switchTab(event, 'wgw')">WGW Queries</button>
+                <button class="tab" onclick="switchTab(event, 'messages')">Messages</button>
+                <button class="tab" onclick="switchTab(event, 'scripts')">SQL Scripts</button>
+            </div>
+            
+            <!-- WSA Tab -->
+            <div id="wsa" class="tab-content active">
+                <div class="credentials">
+                    <strong>WSA Credentials:</strong> Username: redex.usr | Password: r3d3x@Log1nelk **รหัสอาจมีการเปลี่ยนแปลงเช็คอัปเดตกับทีมอีกครั้ง
+                </div>
+                
+                <div class="section">
+                    <h2>1. หา Customer ID ด้วย Phone Number</h2>
+                    <div class="input-group">
+                        <label>Phone Number:</label>
+                        <input type="text" id="phone" placeholder="0837362743" oninput="syncData()">
+                    </div>
+                    <button onclick="generateQuery1()">สร้างคำสั่ง ELK</button>
+                    <div id="output1" class="output" style="display:none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>2. หา CitizenId และ CisId ด้วย Phone Number</h2>
+                    <div class="input-group">
+                        <label>Phone Number: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 1)</small></label>
+                        <input type="text" id="phone2" readonly style="background:#e5e5e5;">
+                    </div>
+                    <button onclick="generateQuery2()">สร้างคำสั่ง ELK</button>
+                    <div id="output2" class="output" style="display:none;"></div>
+                    
+                    <h3 style="margin-top: 20px; color: #666;">กรอกผลลัพธ์ที่ได้จาก ELK:</h3>
+                    <div class="input-group">
+                        <label>CitizenId (New Passport):</label>
+                        <input type="text" id="citizenIdFromElk" placeholder="EM5818511" oninput="syncData()">
+                    </div>
+                    <div class="input-group">
+                        <label>CisId:</label>
+                        <input type="text" id="cisIdFromElk" placeholder="0041940128" oninput="syncData()">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>3. หา Investor ID ด้วย Customer ID</h2>
+                    <div class="input-group">
+                        <label>Customer ID:</label>
+                        <input type="text" id="customerId" placeholder="fb7671de-80bb-478a-b341-37e0738b1223" oninput="syncData()">
+                    </div>
+                    <button onclick="generateQuery3()">สร้างคำสั่ง ELK</button>
+                    <div id="output3" class="output" style="display:none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>4. หา Request-Id ด้วย Investor ID</h2>
+                    <div class="input-group">
+                        <label>Investor ID:</label>
+                        <input type="text" id="investorId" placeholder="a95d582660fd49e3b4c7bd2e0ff45f4b" oninput="syncData()">
+                    </div>
+                    <button onclick="generateQuery4()">สร้างคำสั่ง ELK</button>
+                    <div id="output4" class="output" style="display:none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>5. หา Log Response ด้วย Request-Id</h2>
+                    <div class="input-group">
+                        <label>Request-Id:</label>
+                        <input type="text" id="requestId" placeholder="80800_20250910_32VMk86BJkXBKpLewfuG3w38E6D" oninput="syncData()">
+                    </div>
+                    <button onclick="generateQuery5()">สร้างคำสั่ง ELK</button>
+                    <div id="output5" class="output" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <!-- JSON Formatter Tab -->
+            <div id="json" class="tab-content">
+                <div class="section">
+                    <h2>6. JSON Formatter</h2>
+                    <div class="input-group">
+                        <label>วาง JSON ที่มี \" :</label>
+                        <textarea id="jsonInput" placeholder='{"header":{"requestId":"...",...}}'></textarea>
+                    </div>
+                    <button onclick="formatJSON()">แปลงและจัดรูปแบบ JSON</button>
+                    <div id="jsonOutput" class="json-output" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <!-- WGW Tab -->
+            <div id="wgw" class="tab-content">
+                <div class="credentials">
+                    <strong>WGW Credentials:</strong> Username: wgwusr | Password: V7xx15DPMI83k0 **รหัสอาจมีการเปลี่ยนแปลงเช็คอัปเดตกับทีมอีกครั้ง
+                </div>
+                
+                <div class="section">
+                    <h2>7. หา docId ด้วย Request-Id หรือ Investor ID</h2>
+                    <div class="input-group">
+						<label>Investor ID: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 4)</small></label>
+                        <input type="text" id="investorId2" readonly style="background:#e5e5e5;">
+                        <label>Request-Id: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 5)</small></label>
+                        <input type="text" id="requestId2" readonly style="background:#e5e5e5;">
+                    </div>
+                    <button onclick="generateQuery7()">สร้างคำสั่ง ELK (Request-Id)</button>
+                    <div id="output7" class="output" style="display:none;"></div>
+                    
+                    <h3 style="margin-top: 20px; color: #666;">กรอกผลลัพธ์ที่ได้จาก ELK:</h3>
+                    <div class="input-group">
+                        <label>docId (Old Passport):</label>
+                        <input type="text" id="docIdFromElk" placeholder="E41874011" oninput="syncData()">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>8. หา Document Type</h2>
+                    <div class="input-group">
+                        <label>docId (Old Passport): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 7)</small></label>
+                        <input type="text" id="docIdForType" readonly style="background:#e5e5e5;">
+                    </div>
+                    <button onclick="generateQuery8()">สร้างคำสั่ง ELK</button>
+                    <div id="output8" class="output" style="display:none;"></div>
+                    
+                    <div class="doc-type-info">
+                        <h3>Document Type Codes:</h3>
+                        <ul>
+                            <li><strong>11</strong> = บัตรประชาชน</li>
+                            <li><strong>12</strong> = หนังสือเดินทาง</li>
+                            <li><strong>13</strong> = ใบต่างด้าว</li>
+                            <li><strong>21</strong> = เลขที่จดทะเบียนบริษัท</li>
+                            <li><strong>99</strong> = เอกสารอื่นๆ</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 style="margin-top: 20px; color: #666;">กรอกผลลัพธ์ที่ได้จาก ELK:</h3>
+                    <div class="input-group">
+                        <label>Document Type (Old):</label>
+                        <input type="text" id="docTypeOld" placeholder="12" oninput="syncData()">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages Tab -->
+            <div id="messages" class="tab-content">
+                <div class="section">
+                    <h2>9. ข้อความสำหรับห้อง [WSA x Redex x Inc Team] Production Support</h2>
+                    <div class="input-group">
+                        <label>INC Number:</label>
+                        <input type="text" id="incNum" placeholder="INC000000814529" oninput="syncData()">
+                    </div>
+                    <div class="input-group">
+                        <label>Phone: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 1)</small></label>
+                        <input type="text" id="msgPhone" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>CitizenId (New Passport): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 2)</small></label>
+                        <input type="text" id="citizenId" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>docId (Old Passport): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 7)</small></label>
+                        <input type="text" id="docId" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>CisId: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 2)</small></label>
+                        <input type="text" id="cisId" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>customerId: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 3)</small></label>
+                        <input type="text" id="customerId2" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>InvestorId: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 4)</small></label>
+                        <input type="text" id="investorId3" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>Request-Id: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 5)</small></label>
+                        <input type="text" id="requestId3" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>Response JSON: <small style="color:#999;">(จะถูกกรอกอัตโนมัติจากข้อ 6)</small></label>
+                        <textarea id="responseJson" readonly style="background:#e5e5e5;"></textarea>
+                    </div>
+                    <button onclick="generateMessage1()">สร้างข้อความ</button>
+                    <div id="message1Output" class="output" style="display:none;"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>10. ข้อความสำหรับห้อง App Support – WGW</h2>
+                    <div class="input-group">
+                        <label>Patch Date:</label>
+                        <input type="date" id="patchDate" oninput="syncData()">
+                    </div>
+                    <button onclick="generateMessage2()">สร้างข้อความ</button>
+                    <div id="message2Output" class="output" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <!-- SQL Scripts Tab -->
+            <div id="scripts" class="tab-content">
+                <div class="section">
+                    <h2>11. สร้าง SQL Script Files</h2>
+                    <div class="input-group">
+                        <label>INC Number: <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 9)</small></label>
+                        <input type="text" id="incNumScript" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>Patch Date (YYYYMMDD): <small style="color:#999;">(แปลงจากข้อ 10 อัตโนมัติ)</small></label>
+                        <input type="text" id="patchDateScript" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>CitizenId (New Passport): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 2)</small></label>
+                        <input type="text" id="citizenIdScript" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>docId (Old Passport): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 7)</small></label>
+                        <input type="text" id="docIdScript" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>Document Type (Old): <small style="color:#999;">(ใช้ค่าเดียวกับข้อ 8)</small></label>
+                        <input type="text" id="docTypeOldScript" readonly style="background:#e5e5e5;">
+                    </div>
+                    <div class="input-group">
+                        <label>Document Type (New):</label>
+                        <select id="docTypeNew" onchange="syncData()">
+                            <option value="">-- เลือก Document Type ใหม่ --</option>
+                            <option value="11">11 - บัตรประชาชน</option>
+                            <option value="12">12 - หนังสือเดินทาง</option>
+                            <option value="13">13 - ใบต่างด้าว</option>
+                            <option value="21">21 - เลขที่จดทะเบียนบริษัท</option>
+                            <option value="99">99 - เอกสารอื่นๆ</option>
+                        </select>
+                    </div>
+                    <button onclick="generateScripts()">สร้างและดาวน์โหลด ZIP</button>
+                    <div id="scriptSuccess" class="success" style="display:none;"></div>
+                    <div id="scriptMessage" class="output" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formattedJson = '';
+        
+        const dataStore = {
+            phone: '',
+            customerId: '',
+            investorId: '',
+            requestId: '',
+            incNum: '',
+            citizenId: '',
+            docId: '',
+            cisId: '',
+            responseJson: '',
+            patchDate: '',
+            patchDateScript: '',
+            citizenIdFromElk: '',
+            cisIdFromElk: '',
+            docIdFromElk: '',
+            docTypeOld: '',
+            docTypeNew: ''
+        };
+        
+        function syncData() {
+            dataStore.phone = document.getElementById('phone').value;
+            dataStore.customerId = document.getElementById('customerId').value;
+            dataStore.investorId = document.getElementById('investorId').value;
+            dataStore.requestId = document.getElementById('requestId').value;
+            dataStore.incNum = document.getElementById('incNum').value;
+            
+            dataStore.citizenIdFromElk = document.getElementById('citizenIdFromElk').value;
+            dataStore.cisIdFromElk = document.getElementById('cisIdFromElk').value;
+            dataStore.docIdFromElk = document.getElementById('docIdFromElk').value;
+            dataStore.docTypeOld = document.getElementById('docTypeOld').value;
+            dataStore.docTypeNew = document.getElementById('docTypeNew').value;
+            
+            const patchDateInput = document.getElementById('patchDate').value;
+            if (patchDateInput) {
+                const date = new Date(patchDateInput);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const day = date.getDate();
+                const month = months[date.getMonth()];
+                const year = date.getFullYear();
+                dataStore.patchDate = `${day} ${month} ${year}`;
+                
+                const month2digit = String(date.getMonth() + 1).padStart(2, '0');
+                const day2digit = String(day).padStart(2, '0');
+                dataStore.patchDateScript = `${year}${month2digit}${day2digit}`;
+            }
+            
+            if (dataStore.phone) {
+                document.getElementById('phone2').value = dataStore.phone;
+                document.getElementById('msgPhone').value = dataStore.phone;
+            }
+            
+            if (dataStore.customerId) {
+                document.getElementById('customerId2').value = dataStore.customerId;
+            }
+            
+            if (dataStore.investorId) {
+                document.getElementById('investorId2').value = dataStore.investorId;
+                document.getElementById('investorId3').value = dataStore.investorId;
+            }
+            
+            if (dataStore.requestId) {
+                document.getElementById('requestId2').value = dataStore.requestId;
+                document.getElementById('requestId3').value = dataStore.requestId;
+            }
+            
+            if (dataStore.incNum) {
+                document.getElementById('incNumScript').value = dataStore.incNum;
+            }
+            
+            if (dataStore.citizenIdFromElk) {
+                document.getElementById('citizenId').value = dataStore.citizenIdFromElk;
+                document.getElementById('citizenIdScript').value = dataStore.citizenIdFromElk;
+                dataStore.citizenId = dataStore.citizenIdFromElk;
+            }
+            
+            if (dataStore.cisIdFromElk) {
+                document.getElementById('cisId').value = dataStore.cisIdFromElk;
+                dataStore.cisId = dataStore.cisIdFromElk;
+            }
+            
+            if (dataStore.docIdFromElk) {
+                document.getElementById('docId').value = dataStore.docIdFromElk;
+                document.getElementById('docIdScript').value = dataStore.docIdFromElk;
+                document.getElementById('docIdForType').value = dataStore.docIdFromElk;
+                dataStore.docId = dataStore.docIdFromElk;
+            }
+            
+            if (dataStore.docTypeOld) {
+                document.getElementById('docTypeOldScript').value = dataStore.docTypeOld;
+            }
+            
+            if (dataStore.patchDateScript) {
+                document.getElementById('patchDateScript').value = dataStore.patchDateScript;
+            }
+        }
+        
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        function generateQuery1() {
+            const phone = dataStore.phone || document.getElementById('phone').value;
+            const query = `"${phone}" and "customerId"`;
+            const output = document.getElementById('output1');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output1\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery2() {
+            const phone = dataStore.phone || document.getElementById('phone').value;
+            const query = `"${phone}" and "CisIdInfo" and "CitizenId" and "CisId"`;
+            const output = document.getElementById('output2');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output2\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery3() {
+            const customerId = dataStore.customerId || document.getElementById('customerId').value;
+            const query = `"${customerId}" and "investorId"`;
+            const output = document.getElementById('output3');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output3\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery4() {
+            const investorId = dataStore.investorId || document.getElementById('investorId').value;
+            const query = `"v2/${investorId}" and "X-Request-Id"`;
+            const output = document.getElementById('output4');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output4\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery5() {
+            const requestId = dataStore.requestId || document.getElementById('requestId').value;
+            const query = `"${requestId}" and "response"`;
+            const output = document.getElementById('output5');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output5\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery7() {
+            const requestId = dataStore.requestId || document.getElementById('requestId').value;
+			const investorId = dataStore.investorId || document.getElementById('investorId').value;
+            const query = `"${investorId}" and "documentId" or "${requestId}" and "docId"`;
+            const output = document.getElementById('output7');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output7\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateQuery8() {
+            const docId = dataStore.docId || document.getElementById('docIdForType').value;
+            const query = `"${docId}" and "documenttype"`;
+            const output = document.getElementById('output8');
+            output.innerHTML = query + '<button class="copy-btn" onclick="copyToClipboard(\'output8\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function formatJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const output = document.getElementById('jsonOutput');
+            
+            try {
+                const cleaned = input.replace(/\\"/g, '"');
+                const parsed = JSON.parse(cleaned);
+                formattedJson = JSON.stringify(parsed, null, 4);
+                
+                const highlighted = syntaxHighlight(formattedJson);
+                output.innerHTML = '<pre>' + highlighted + '</pre><button class="copy-btn" onclick="copyJSON()">Copy</button>';
+                output.style.display = 'block';
+                
+                document.getElementById('responseJson').value = input;
+                dataStore.responseJson = input;
+            } catch (e) {
+                output.innerHTML = '<pre style="color:#ff6b6b;">Error: Invalid JSON - ' + e.message + '</pre>';
+                output.style.display = 'block';
+            }
+        }
+        
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+        
+        function copyJSON() {
+            navigator.clipboard.writeText(formattedJson).then(() => {
+                const btn = document.querySelector('#jsonOutput .copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+        
+        function generateMessage1() {
+            const inc = dataStore.incNum;
+            const phone = dataStore.phone;
+            const citizenId = dataStore.citizenId;
+            const docId = dataStore.docId;
+            const cisId = dataStore.cisId;
+            const customerId = dataStore.customerId;
+            const investorId = dataStore.investorId;
+            const requestId = dataStore.requestId;
+            const response = dataStore.responseJson;
+            
+            let formattedResponse = response;
+            if (response) {
+                try {
+                    const cleaned = response.replace(/\\"/g, '"');
+                    const parsed = JSON.parse(cleaned);
+                    formattedResponse = JSON.stringify(parsed, null, 4);
+                } catch (e) {
+                    // Use as is if not valid JSON
+                }
+            }
+            
+            const message = `@Jadsadakon เดี่ยวส่งต่อ WGW ทำการ Patch Update Passport No. ต่อครับ
+cc @Bhasakorn
+ 
+${inc}
+ 
+Phone: ${phone}
+ 
+CitizenId: ${citizenId} #NewPassport
+docId: ${docId} #OldPassport
+ 
+CisId: ${cisId}
+customerId: ${customerId}
+InvestorId: ${investorId}
+ 
+Request-Id: ${requestId}
+ 
+Response:
+${formattedResponse}`;
+            
+            const output = document.getElementById('message1Output');
+            output.innerHTML = message + '<button class="copy-btn" onclick="copyToClipboard(\'message1Output\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        function generateMessage2() {
+            const patchDate = dataStore.patchDate;
+            const inc = dataStore.incNum;
+            const phone = dataStore.phone;
+            const citizenId = dataStore.citizenId;
+            const docId = dataStore.docId;
+            const cisId = dataStore.cisId;
+            const customerId = dataStore.customerId;
+            const investorId = dataStore.investorId;
+            const requestId = dataStore.requestId;
+            const response = dataStore.responseJson;
+            
+            let formattedResponse = response;
+            if (response) {
+                try {
+                    const cleaned = response.replace(/\\"/g, '"');
+                    const parsed = JSON.parse(cleaned);
+                    formattedResponse = JSON.stringify(parsed, null, 4);
+                } catch (e) {
+                    // Use as is if not valid JSON
+                }
+            }
+            
+            const message = `@Bhasakorn @Nantich  มีแจ้ง Case Passport ของ ${inc} ครับ
+เดี่ยวผมตรียม SQL Script ให้นะครับ >> Patch Date = ${patchDate} ครับ
+ 
+Phone: ${phone}
+ 
+CitizenId: ${citizenId} #NewPassport
+docId: ${docId} #OldPassport
+ 
+CisId: ${cisId}
+customerId: ${customerId}
+InvestorId: ${investorId}
+ 
+Request-Id: ${requestId}
+ 
+Response:
+${formattedResponse}`;
+            
+            const output = document.getElementById('message2Output');
+            output.innerHTML = message + '<button class="copy-btn" onclick="copyToClipboard(\'message2Output\')">Copy</button>';
+            output.style.display = 'block';
+        }
+        
+        async function generateScripts() {
+            const inc = dataStore.incNum;
+            const patchDate = dataStore.patchDateScript;
+            const citizenId = dataStore.citizenId;
+            const docId = dataStore.docId;
+            const docTypeOld = dataStore.docTypeOld;
+            const docTypeNew = dataStore.docTypeNew;
+            const patchDateFormatted = dataStore.patchDate;
+            
+            if (!inc || !patchDate || !citizenId || !docId) {
+                alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+                return;
+            }
+            
+            if (!docTypeNew) {
+                alert('กรุณาเลือก Document Type (New)');
+                return;
+            }
+            
+            const backup = `CREATE TABLE WGW_ACCOUNT_MANAGEMENT.T_INVESTOR_BAK_${patchDate} AS SELECT * FROM WGW_ACCOUNT_MANAGEMENT.T_INVESTOR;`;
+            
+            let update;
+            if (docTypeOld === docTypeNew) {
+                // Same document type - only update DOC_ID
+                update = `UPDATE WGW_ACCOUNT_MANAGEMENT.T_INVESTOR SET DOC_ID = '${citizenId}' WHERE DOC_ID = '${docId}';`;
+            } else {
+                // Different document type - update both DOC_TYPE and DOC_ID
+                update = `UPDATE WGW_ACCOUNT_MANAGEMENT.T_INVESTOR SET DOC_TYPE='${docTypeNew}', DOC_ID = '${citizenId}' WHERE DOC_ID = '${docId}';`;
+            }
+            
+            const verify = `SELECT INVESTOR_ID, DOC_ID FROM WGW_ACCOUNT_MANAGEMENT.T_INVESTOR WHERE DOC_ID in ('${citizenId}', '${docId}');`;
+            
+            // Create folder structure in ZIP
+            const zip = new JSZip();
+            const folder = zip.folder(inc);
+            folder.file('1_Backup.sql', backup);
+            folder.file('2_Update.sql', update);
+            folder.file('3_Verify.sql', verify);
+            
+            const content = await zip.generateAsync({type: 'blob'});
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${inc}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            const success = document.getElementById('scriptSuccess');
+            success.textContent = `✅ สร้างไฟล์ ${inc}.zip สำเร็จ! กำลังดาวน์โหลด...`;
+            success.style.display = 'block';
+            setTimeout(() => success.style.display = 'none', 5000);
+            
+            // Generate and show the message for WGW team
+            const message = `@Bhasakorn @Nantich 
+Script File ครับ
+ref. ${inc}
+Patch Date = ${patchDateFormatted}
+ 
+CitizenId: ${citizenId} #NewPassport
+docId: ${docId} #OldPassport`;
+            
+            const messageOutput = document.getElementById('scriptMessage');
+            messageOutput.innerHTML = message + '<button class="copy-btn" onclick="copyToClipboard(\'scriptMessage\')">Copy</button>';
+            messageOutput.style.display = 'block';
+        }
+        
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
