@@ -961,31 +961,12 @@
                         ${htmlBody}
                     </div>
                 </div>
-                <button class="btn-success" onclick="copyOdateEmail()">📋 คัดลอกข้อความ</button>
             `;
             
             resultDiv.innerHTML = html;
             resultDiv.classList.add('show');
             
             window.odateEmailText = `${subject}\n\n${emailBody.replace(/\*\*/g, '')}`;
-        }
-
-        function copyOdateEmail() {
-            const text = window.odateEmailText;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.querySelector('#odateResult .btn-success');
-                const originalText = btn.textContent;
-                btn.textContent = '✅ คัดลอกแล้ว!';
-                btn.classList.add('copied');
-                
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                alert('ไม่สามารถคัดลอกได้: ' + err);
-            });
         }
     </script>
 </body>
