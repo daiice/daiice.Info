@@ -8,8 +8,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-	
-    <title>Passport Change Tool_V6 by Daiice</title>
+  
+    <title>Passport Change Tool_V7 by Daiice</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * {
@@ -260,7 +260,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔐 Passport Change Tool_V6 by Daiice</h1>
+            <h1>🔐 Passport Change Tool_V7 by Daiice</h1>
             <div class="links">
                 <a href="https://infraelk.kasikornbank.com" target="_blank">PRD Site</a>
                 <a href="https://infraelkdr.kasikornbank.com" target="_blank">DR Site</a>
@@ -853,13 +853,13 @@ ${formattedResponse}`;
             const url = URL.createObjectURL(content);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${inc}.zip`;
+            a.download = `${inc}.7z`;
             a.click();
             URL.revokeObjectURL(url);
             
             // Show success message
             const success = document.getElementById('scriptSuccess');
-            success.textContent = `✅ สร้างไฟล์ ${inc}.zip สำเร็จ! กำลังดาวน์โหลด...`;
+            success.textContent = `✅ สร้างไฟล์ ${inc}.7z สำเร็จ! กำลังดาวน์โหลด...`;
             success.style.display = 'block';
             setTimeout(() => success.style.display = 'none', 5000);
             
