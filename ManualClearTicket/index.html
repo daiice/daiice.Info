@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Clear Ticket V2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .url-display {
+            background: #f8f9fa;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #666;
+            word-break: break-all;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 320px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .clear-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .response-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .response-header h3 {
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .response-body {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .response-body pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-note {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #555;
+        }
+
+        .channel-dropdown {
+            position: absolute;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            margin-top: 2px;
+        }
+
+        .channel-group {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            font-weight: 600;
+            font-size: 12px;
+            color: #666;
+            position: sticky;
+            top: 0;
+        }
+
+        .channel-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .channel-item:hover {
+            background: #f0f0ff;
+        }
+
+        .no-results {
+            padding: 10px 12px;
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+        }
+		
+		.links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .links a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .links a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+		
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Manual Clear Ticket V2</h1>
+			<div class="links">
+                <a href="https://sprdwkccrepo01.kasikornbank.com:8185/ece-kill-chat" target="_blank">ECE Kill Chat</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="info-note">
+                💡 <strong>หมายเหตุ : </strong> ต้องใช้ร่วมกับ Extension "Allow CORS: Access-Control-Allow-Origin"
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label>Session ID</label>
+                    <input type="text" id="sessionId" placeholder="ใส่ Session ID">
+                </div>
+
+                <div class="form-group">
+                    <label>Channel</label>
+                    <input type="text" id="channelInput" placeholder="พิมพ์เพื่อค้นหา Channel..." autocomplete="off">
+                    <div id="channelList" class="channel-dropdown hidden"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>URL ที่จะส่ง Request</label>
+                <div class="url-display" id="urlDisplay">กรุณาเลือก Channel ก่อน</div>
+            </div>
+
+            <div class="form-group">
+                <label>Request Body (JSON) - อัปเดตอัตโนมัติตาม Session ID</label>
+                <textarea id="body">{
+    "message": [
+        {
+            "conversation": {
+                "id": "Session_id"
+            },
+            "type": {
+                "value": "complete"
+            },
+            "content": "Agent has end the chat",
+            "sender": {
+                "type": "system"
+            },
+            "timeStamp": 1553702329000,
+            "id": "7499702301"
+        }
+    ]
+}</textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="send-btn" id="sendBtn" onclick="sendRequest()">Send Request</button>
+                <button class="clear-btn" onclick="clearAll()">Clear</button>
+            </div>
+
+            <div class="response-section hidden" id="responseSection">
+                <div class="response-header">
+                    <h3>Response</h3>
+                    <span class="status-badge" id="statusBadge"></span>
+                </div>
+                <div class="response-body">
+                    <pre id="responseBody"></pre>
+                </div>
+            </div>
+
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <span>Sending request...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Channel Data
+        const channelGroups = {
+            '1. K CONNECT LINE': [
+                'EHD_CHAT_BANCASSURANCE', 'EHD_CHAT_BN_ACCOUNTING', 'EHD_CHAT_BN_PROCESS',
+                'EHD_CHAT_CCPL', 'EHD_CHAT_COMPLAINT_DS', 'EHD_CHAT_COMPLAINT_EHD',
+                'EHD_CHAT_COMPLAINT_HOLIDAY', 'EHD_CHAT_CREDIT', 'EHD_CHAT_DUMMY5',
+                'EHD_CHAT_DUMMY6', 'EHD_CHAT_DUMMY7', 'EHD_CHAT_DUMMY8', 'EHD_CHAT_DUMMY9',
+                'EHD_CHAT_ESPOKE', 'EHD_CHAT_GENERAL', 'EHD_CHAT_HOLIDAY', 'EHD_CHAT_IT',
+                'EHD_CHAT_KCC_FRAUD', 'EHD_CHAT_KL', 'EHD_CHAT_MERCHANT', 'EHD_CHAT_MF',
+                'EHD_CHAT_NON_CREDIT', 'EHD_CHAT_NON_IT', 'EHD_CHAT_SO_CONTACT', 'EHD_CHAT_SPECIAL'
+            ],
+            '2. KKBANK LIVE': [
+                'KCC _CHAT_SV_BANCASSURANCE', 'KCC_CHAT_AA_ADV', 'KCC_CHAT_AA_INT',
+                'KCC_CHAT_ACCOUNT_ADV', 'KCC_CHAT_ACCOUNT_INT', 'KCC_CHAT_ATM_ADV',
+                'KCC_CHAT_ATM_INT', 'KCC_CHAT_BANCASSUR_LOAN_ADV', 'KCC_CHAT_BANCASSUR_LOAN_INT',
+                'KCC_CHAT_BL_ADV', 'KCC_CHAT_BL_INT', 'KCC_CHAT_CBS_CHEQUE', 'KCC_CHAT_CBS_EBANKING',
+                'KCC_CHAT_CBS_ENGLISH', 'KCC_CHAT_CBS_ENQUIRY', 'KCC_CHAT_CBS_MERCHANT',
+                'KCC_CHAT_COMPLAINT', 'KCC_CHAT_COMPLAINT_STAFF', 'KCC_CHAT_CRC',
+                'KCC_CHAT_CREDIT_CARD_ADV', 'KCC_CHAT_CREDIT_CARD_INT', 'KCC_CHAT_DUMMY_10',
+                'KCC_CHAT_DUMMY_8', 'KCC_CHAT_DUMMY_9', 'KCC_CHAT_EVENT_3', 'KCC_CHAT_FRAUD',
+                'KCC_CHAT_GENERAL_BACKUP', 'KCC_CHAT_INNOVATION', 'KCC_CHAT_INVESTMENT_LEASING',
+                'KCC_CHAT_KA', 'KCC_CHAT_KL', 'KCC_CHAT_KPLUS_ADV', 'KCC_CHAT_KPLUS_INT',
+                'KCC_CHAT_KS', 'KCC_CHAT_MERCHANT', 'KCC_CHAT_SPECIAL', 'KCC_CHAT_SUSPEND',
+                'KCC_CHAT_SUSPEND_New', 'KCC_CHAT_SUSPENSE_Assign', 'KCC_CHAT_SV_BA_HEALTH_SERVICE',
+                'KCC_CHAT_SV_DOOHAINA', 'KCC_CHAT_SV_MF', 'KCC_CHAT_SV_VRM', 'KCC_CHAT_SV_WEALTH',
+                'KCC_CHAT_THE_WISDOM', 'KCC_CHAT_URGENT_PUBLIC'
+            ],
+            '3. K CONNECT WEB': [
+                'KGURU_CHAT_BL', 'KGURU_CHAT_BN_ACCOUNTING', 'KGURU_CHAT_BN_PROCESS',
+                'KGURU_CHAT_CCPL', 'KGURU_CHAT_COMPLAINT_DS', 'KGURU_CHAT_COMPLAINT_EHD',
+                'KGURU_CHAT_COMPLAINT_HOLIDAY', 'KGURU_CHAT_CRC', 'KGURU_CHAT_CREDIT',
+                'KGURU_CHAT_DUMMY5', 'KGURU_CHAT_DUMMY6', 'KGURU_CHAT_DUMMY7',
+                'KGURU_CHAT_DUMMY8', 'KGURU_CHAT_DUMMY9', 'KGURU_CHAT_ESPOKE',
+                'KGURU_CHAT_GENERAL', 'KGURU_CHAT_HOLIDAY', 'KGURU_CHAT_IT',
+                'KGURU_CHAT_KL', 'KGURU_CHAT_MERCHANT', 'KGURU_CHAT_MF',
+                'KGURU_CHAT_NON_CREDIT', 'KGURU_CHAT_NON_IT', 'KGURU_CHAT_SO_CONTACT',
+                'KGURU_CHAT_SPECIAL'
+            ],
+            '4. LINE BK': [
+                'KCC_CHAT_LINE_BK_ACCOUNT', 'KCC_CHAT_LINE_BK_PERSONAL_LOAN'
+            ],
+            '5. KGP/KSME/K-Merchant': [
+                'KCC_CHAT_KGP', 'KCC_CHAT_KSME', 'KCC_CHAT_KBIZ_BSC'
+            ],
+            '6. KLOUD': [
+                'KCC_CHAT_KLOUD'
+            ]
+        };
+        
+        // URL Mapping - แก้ไข URL ตรงนี้
+        const urlMap = {
+            // 1. K CONNECT LINE
+            'EHD_CHAT_BANCASSURANCE': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_BN_ACCOUNTING': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_BN_PROCESS': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_CCPL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_COMPLAINT_DS': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_COMPLAINT_EHD': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_COMPLAINT_HOLIDAY': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_CREDIT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_DUMMY5': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_DUMMY6': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_DUMMY7': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_DUMMY8': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_DUMMY9': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_ESPOKE': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_GENERAL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_HOLIDAY': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_IT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_KCC_FRAUD': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_KL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_MERCHANT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_MF': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_NON_CREDIT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_NON_IT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_SO_CONTACT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'EHD_CHAT_SPECIAL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            
+            // 2. KKBANK LIVE
+            'KCC _CHAT_SV_BANCASSURANCE': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_AA_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_AA_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_ACCOUNT_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_ACCOUNT_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_ATM_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_ATM_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_BANCASSUR_LOAN_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_BANCASSUR_LOAN_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_BL_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_BL_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CBS_CHEQUE': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CBS_EBANKING': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CBS_ENGLISH': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CBS_ENQUIRY': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CBS_MERCHANT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_COMPLAINT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_COMPLAINT_STAFF': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CRC': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CREDIT_CARD_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_CREDIT_CARD_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_DUMMY_10': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_DUMMY_8': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_DUMMY_9': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_EVENT_3': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_FRAUD': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_GENERAL_BACKUP': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_INNOVATION': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_INVESTMENT_LEASING': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_KA': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_KL': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_KPLUS_ADV': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_KPLUS_INT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_KS': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_MERCHANT': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SPECIAL': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SUSPEND': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SUSPEND_New': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SUSPENSE_Assign': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SV_BA_HEALTH_SERVICE': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SV_DOOHAINA': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SV_MF': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SV_VRM': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_SV_WEALTH': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_THE_WISDOM': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            'KCC_CHAT_URGENT_PUBLIC': 'https://kbank-live-wrapper-prod.convolab.ai/receive/ticket',
+            
+            // 3. K CONNECT WEB
+            'KGURU_CHAT_BL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_BN_ACCOUNTING': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_BN_PROCESS': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_CCPL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_COMPLAINT_DS': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_COMPLAINT_EHD': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_COMPLAINT_HOLIDAY': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_CRC': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_CREDIT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_DUMMY5': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_DUMMY6': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_DUMMY7': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_DUMMY8': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_DUMMY9': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_ESPOKE': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_GENERAL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_HOLIDAY': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_IT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_KL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_MERCHANT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_MF': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_NON_CREDIT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_NON_IT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_SO_CONTACT': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            'KGURU_CHAT_SPECIAL': 'https://kbank-k4w-web-wrapper-prod.convolab.ai/receive/main',
+            
+            // 4. LINE BK
+            'KCC_CHAT_LINE_BK_ACCOUNT': 'https://kbank-line-bk-gwe-prod.amitysolutions.com/receive/main',
+            'KCC_CHAT_LINE_BK_PERSONAL_LOAN': 'https://kbank-line-bk-gwe-prod.amitysolutions.com/receive/main',
+            
+            // 5. KGP/KSME/K-Merchant
+            'KCC_CHAT_KGP': 'https://kbank-kgp-ksme-wrapper-prod.convolab.ai/receive/main',
+            'KCC_CHAT_KSME': 'https://kbank-kgp-ksme-wrapper-prod.convolab.ai/receive/main',
+            'KCC_CHAT_KBIZ_BSC': 'https://kbank-kgp-ksme-wrapper-prod.convolab.ai/receive/main',
+            
+            // 6. KLOUD
+            'KCC_CHAT_KLOUD': 'https://kbank-sq-kloud-wrapper-prod.convolab.ai/receive/main'
+        };
+
+        let selectedChannel = '';
+
+        // Update body preview when Session ID changes
+        const sessionIdInput = document.getElementById('sessionId');
+        const bodyTextarea = document.getElementById('body');
+
+        sessionIdInput.addEventListener('input', function() {
+            updateBodyPreview();
+        });
+
+        function updateBodyPreview() {
+            const sessionId = sessionIdInput.value.trim();
+            const defaultBody = `{
+    "message": [
+        {
+            "conversation": {
+                "id": "${sessionId || 'Session_id'}"
+            },
+            "type": {
+                "value": "complete"
+            },
+            "content": "Agent has end the chat",
+            "sender": {
+                "type": "system"
+            },
+            "timeStamp": 1553702329000,
+            "id": "7499702301"
+        }
+    ]
+}`;
+            
+            bodyTextarea.value = defaultBody;
+        }
+
+        // Channel autocomplete
+        const channelInput = document.getElementById('channelInput');
+        const channelList = document.getElementById('channelList');
+
+        channelInput.addEventListener('input', function() {
+            filterChannels();
+        });
+
+        channelInput.addEventListener('focus', function() {
+            if (channelInput.value === '') {
+                showAllChannels();
+            } else {
+                filterChannels();
+            }
+        });
+
+        function showAllChannels() {
+            channelList.innerHTML = '';
+            channelList.classList.remove('hidden');
+            
+            for (const [group, channels] of Object.entries(channelGroups)) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'channel-group';
+                groupDiv.textContent = group;
+                channelList.appendChild(groupDiv);
+                
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.className = 'channel-item';
+                    item.textContent = channel;
+                    item.onclick = () => selectChannel(channel);
+                    channelList.appendChild(item);
+                });
+            }
+        }
+
+        function filterChannels() {
+            const input = channelInput.value.toLowerCase();
+            
+            if (input === '') {
+                showAllChannels();
+                return;
+            }
+            
+            channelList.innerHTML = '';
+            channelList.classList.remove('hidden');
+            
+            let hasResults = false;
+            
+            for (const [group, channels] of Object.entries(channelGroups)) {
+                const filtered = channels.filter(ch => ch.toLowerCase().includes(input));
+                
+                if (filtered.length > 0) {
+                    hasResults = true;
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'channel-group';
+                    groupDiv.textContent = group;
+                    channelList.appendChild(groupDiv);
+                    
+                    filtered.forEach(channel => {
+                        const item = document.createElement('div');
+                        item.className = 'channel-item';
+                        item.textContent = channel;
+                        item.onclick = () => selectChannel(channel);
+                        channelList.appendChild(item);
+                    });
+                }
+            }
+            
+            if (!hasResults) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = 'ไม่พบ Channel';
+                channelList.appendChild(noResults);
+            }
+        }
+
+        function selectChannel(channel) {
+            channelInput.value = channel;
+            selectedChannel = channel;
+            channelList.classList.add('hidden');
+            updateUrl();
+        }
+
+        function updateUrl() {
+            const urlDisplay = document.getElementById('urlDisplay');
+            
+            if (selectedChannel && urlMap[selectedChannel]) {
+                urlDisplay.textContent = urlMap[selectedChannel];
+                urlDisplay.style.color = '#333';
+            } else {
+                urlDisplay.textContent = 'กรุณาเลือก Channel ก่อน';
+                urlDisplay.style.color = '#999';
+            }
+        }
+
+        // Hide channel list when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== channelInput && !channelList.contains(e.target)) {
+                channelList.classList.add('hidden');
+            }
+        });
+
+        async function sendRequest() {
+            const sessionId = sessionIdInput.value.trim();
+            let body = bodyTextarea.value.trim();
+            const sendBtn = document.getElementById('sendBtn');
+            const loading = document.getElementById('loading');
+            const responseSection = document.getElementById('responseSection');
+
+            // Validate inputs
+            if (!sessionId) {
+                alert('กรุณาใส่ Session ID');
+                return;
+            }
+
+            if (!selectedChannel) {
+                alert('กรุณาเลือก Channel');
+                return;
+            }
+
+            const url = urlMap[selectedChannel];
+            if (!url) {
+                alert('ไม่พบ URL สำหรับ Channel นี้');
+                return;
+            }
+
+            // Show loading
+            loading.classList.remove('hidden');
+            responseSection.classList.add('hidden');
+            sendBtn.disabled = true;
+
+            try {
+                // Validate JSON
+                JSON.parse(body);
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: body
+                };
+
+                const response = await fetch(url, options);
+                const responseText = await response.text();
+                
+                let responseData;
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (e) {
+                    responseData = responseText;
+                }
+
+                displayResponse(response.status, response.ok, responseData);
+
+            } catch (error) {
+                displayResponse(0, false, {
+                    error: error.message,
+                    details: 'Failed to send request. กรุณาตรวจสอบ URL และเปิด CORS Extension',
+                    tip: 'ตรวจสอบว่าเปิด "Allow CORS: Access-Control-Allow-Origin" แล้ว'
+                });
+            } finally {
+                loading.classList.add('hidden');
+                sendBtn.disabled = false;
+            }
+        }
+
+        function displayResponse(status, success, data) {
+            const responseSection = document.getElementById('responseSection');
+            const statusBadge = document.getElementById('statusBadge');
+            const responseBody = document.getElementById('responseBody');
+
+            responseSection.classList.remove('hidden');
+
+            // Set status badge
+            if (success) {
+                statusBadge.className = 'status-badge status-success';
+                statusBadge.textContent = `Status: ${status} OK`;
+            } else {
+                statusBadge.className = 'status-badge status-error';
+                statusBadge.textContent = status === 0 ? 'Error' : `Status: ${status} Error`;
+            }
+
+            // Format and display response
+            if (typeof data === 'object') {
+                responseBody.textContent = JSON.stringify(data, null, 2);
+            } else {
+                responseBody.textContent = data;
+            }
+        }
+
+        function clearAll() {
+            sessionIdInput.value = '';
+            channelInput.value = '';
+            selectedChannel = '';
+            bodyTextarea.value = `{
+    "message": [
+        {
+            "conversation": {
+                "id": "Session_id"
+            },
+            "type": {
+                "value": "complete"
+            },
+            "content": "Agent has end the chat",
+            "sender": {
+                "type": "system"
+            },
+            "timeStamp": 1553702329000,
+            "id": "7499702301"
+        }
+    ]
+}`;
+            document.getElementById('urlDisplay').textContent = 'กรุณาเลือก Channel ก่อน';
+            document.getElementById('urlDisplay').style.color = '#999';
+            document.getElementById('responseSection').classList.add('hidden');
+            channelList.classList.add('hidden');
+        }
+
+        // Allow sending with Ctrl+Enter
+        bodyTextarea.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                sendRequest();
+            }
+        });
+    </script>
+</body>
+</html>
